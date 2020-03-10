@@ -1,7 +1,6 @@
 package ru.shakurov.servlet_spring.repositories.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -69,6 +68,7 @@ public class UserRepositoryJdbcTemplateImpl implements UserRepository {
             ps.setString(5, entity.getState());
             return ps;
         }, keyHolder);
+        entity.setId((Integer) keyHolder.getKey());
     }
 
     @Override
