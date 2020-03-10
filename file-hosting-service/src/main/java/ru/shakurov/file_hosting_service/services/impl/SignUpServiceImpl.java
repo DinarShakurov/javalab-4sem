@@ -26,6 +26,8 @@ public class SignUpServiceImpl implements SignUpService {
     private UserRepository userRepository;
     @Autowired
     private Configuration configuration;
+    @Autowired
+    private MailSender mailSender;
 
     @Override
     public void signUp(SignUpDto dto) {
@@ -41,7 +43,7 @@ public class SignUpServiceImpl implements SignUpService {
         } catch (IOException | TemplateException e) {
             throw new IllegalStateException(e);
         }
-        System.out.println(mailText);
+
         User user = User.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
@@ -51,7 +53,8 @@ public class SignUpServiceImpl implements SignUpService {
                 .build();
         userRepository.save(user);
 
-        MailSender mailSender = new MailSender(mailText, user.getEmail());
-        mailSender.send();
+        mailSender.setText(mailText)
+                .setTo(user.getEmail())
+                .send();
     }
 }

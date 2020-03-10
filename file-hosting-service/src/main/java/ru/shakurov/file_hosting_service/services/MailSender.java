@@ -1,6 +1,7 @@
 package ru.shakurov.file_hosting_service.services;
 
 
+import org.springframework.stereotype.Component;
 import ru.shakurov.file_hosting_service.EmailInfo;
 
 import javax.mail.*;
@@ -8,14 +9,15 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
+@Component
 public class MailSender {
     private String text;
     private String to;
 
-    public MailSender(String text, String to) {
+    /*public MailSender(String text, String to) {
         this.text = text;
         this.to = to;
-    }
+    }*/
 
     public void send() {
         Properties properties = new Properties();
@@ -50,5 +52,15 @@ public class MailSender {
         } catch (MessagingException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public MailSender setText(String text) {
+        this.text = text;
+        return this;
+    }
+
+    public MailSender setTo(String to) {
+        this.to = to;
+        return this;
     }
 }

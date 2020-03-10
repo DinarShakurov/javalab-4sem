@@ -1,6 +1,7 @@
 package ru.shakurov.file_hosting_service.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 @Controller
 public class FilesController {
+    @Qualifier("proxied")
     @Autowired
     private FilesService filesService;
 

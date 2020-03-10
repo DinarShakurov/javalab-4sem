@@ -3,7 +3,9 @@ package ru.shakurov.file_hosting_service.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import freemarker.template.TemplateExceptionHandler;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -14,6 +16,9 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
+import ru.shakurov.file_hosting_service.aspects.EmailAdvice;
+import ru.shakurov.file_hosting_service.services.FilesService;
+import ru.shakurov.file_hosting_service.services.impl.FilesServiceImpl;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -70,5 +75,18 @@ public class ApplicationContextConfiguration {
         hikariConfig.setPassword(environment.getProperty("db.password"));
         hikariConfig.setDriverClassName(environment.getProperty("db.driver"));
         return hikariConfig;
+    }
+
+    @Qualifier("default")
+    @Autowired
+    public FilesService filesService;
+    @Autowired
+    public EmailAdvice emailAdvice;
+
+    @Bean("proxied")
+    public FilesService getFilesService() {
+        ProxyFactory proxyFactory = new ProxyFactory(filesService);
+        proxyFactory.addAdvice(emailAdvice);
+        return (FilesService) proxyFactory.getProxy();
     }
 }
