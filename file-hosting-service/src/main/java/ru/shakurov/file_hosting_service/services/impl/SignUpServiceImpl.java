@@ -1,8 +1,6 @@
 package ru.shakurov.file_hosting_service.services.impl;
 
 import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.shakurov.file_hosting_service.models.User;
@@ -11,38 +9,22 @@ import ru.shakurov.file_hosting_service.repositories.UserRepository;
 import ru.shakurov.file_hosting_service.services.MailSender;
 import ru.shakurov.file_hosting_service.services.SignUpService;
 
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Component
+@Component ("default_SignUpService")
 public class SignUpServiceImpl implements SignUpService {
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private Configuration configuration;
-    @Autowired
-    private MailSender mailSender;
+/*    @Autowired
+    private Configuration cfg;*/
 
     @Override
-    public void signUp(SignUpDto dto) {
+    public Map<String, Object> signUp(SignUpDto dto) {
         String confirmLink = UUID.randomUUID().toString();
-        String mailText = "http://localhost:8080/confirm/" + confirmLink;
-        try {
-            Template template = configuration.getTemplate("email_content.ftlh");
-            Map<String, Object> map = new HashMap<>();
-            map.put("link", mailText);
-            Writer out = new StringWriter();
-            template.process(map, out);
-            mailText = out.toString();
-        } catch (IOException | TemplateException e) {
-            throw new IllegalStateException(e);
-        }
+        String link = "http://localhost:8080/confirm/" + confirmLink;
 
         User user = User.builder()
                 .name(dto.getName())
@@ -53,8 +35,15 @@ public class SignUpServiceImpl implements SignUpService {
                 .build();
         userRepository.save(user);
 
-        mailSender.setText(mailText)
+        Map<String, Object> map = new HashMap<>();
+        map.put("link", link);
+        map.put("emailTo", user.getEmail());
+        map.put("templateName", "email_confirmation.ftlh");
+        return map;
+        /*new MailSender().setConfiguration(cfg)
+                .setLink(link)
+                .setTemplateName("email_confirmation.ftlh")
                 .setTo(user.getEmail())
-                .send();
+                .send();*/
     }
 }

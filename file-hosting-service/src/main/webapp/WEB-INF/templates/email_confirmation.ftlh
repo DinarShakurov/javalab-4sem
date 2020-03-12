@@ -7,6 +7,8 @@
     <title>Document</title>
 </head>
 <body>
-    <a href=${link}> Ссылка</a>
+        <a href=${link}>
+            <img src ="cid:pappich" alt="papanya">
+        </a>
 </body>
 </html>

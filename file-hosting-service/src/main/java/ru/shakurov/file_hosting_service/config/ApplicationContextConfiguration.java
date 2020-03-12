@@ -12,17 +12,18 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import ru.shakurov.file_hosting_service.aspects.EmailAdvice;
 import ru.shakurov.file_hosting_service.services.FilesService;
-import ru.shakurov.file_hosting_service.services.impl.FilesServiceImpl;
+import ru.shakurov.file_hosting_service.services.MailSender;
+import ru.shakurov.file_hosting_service.services.SignUpService;
 
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 @Configuration
 @PropertySource("classpath:application.properties")
@@ -77,16 +78,35 @@ public class ApplicationContextConfiguration {
         return hikariConfig;
     }
 
-    @Qualifier("default")
+    @Bean
+    public Properties properties() {
+        Properties properties = new Properties();
+        properties.setProperty("storage.path", environment.getProperty("storage.path"));
+        return properties;
+    }
+
+    @Autowired
+    private EmailAdvice emailAdvice;
+
+    @Qualifier("default_SignUpService")
+    @Autowired
+    public SignUpService signUpService;
+
+    @Bean("proxied_SignUpService")
+    public SignUpService getSignUpService() throws IOException {
+        ProxyFactory proxyFactory = new ProxyFactory(signUpService);
+        proxyFactory.addAdvice(this.emailAdvice);
+        return (SignUpService) proxyFactory.getProxy();
+    }
+
+    @Qualifier("default_FilesService")
     @Autowired
     public FilesService filesService;
-    @Autowired
-    public EmailAdvice emailAdvice;
 
-    @Bean("proxied")
-    public FilesService getFilesService() {
+    @Bean("proxied_FilesService")
+    public FilesService getFilesService() throws IOException {
         ProxyFactory proxyFactory = new ProxyFactory(filesService);
-        proxyFactory.addAdvice(emailAdvice);
+        proxyFactory.addAdvice(this.emailAdvice);
         return (FilesService) proxyFactory.getProxy();
     }
 }

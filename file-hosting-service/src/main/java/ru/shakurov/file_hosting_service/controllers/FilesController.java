@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Controller
 public class FilesController {
-    @Qualifier("proxied")
+    @Qualifier("proxied_FilesService")
     @Autowired
     private FilesService filesService;
 

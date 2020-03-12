@@ -1,7 +1,6 @@
 package ru.shakurov.file_hosting_service.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -11,24 +10,32 @@ import ru.shakurov.file_hosting_service.repositories.FilesRepository;
 import ru.shakurov.file_hosting_service.services.FilesService;
 import ru.shakurov.file_hosting_service.services.MailSender;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 
-@Component("default")
+@Component("default_FilesService")
 public class FilesServiceImpl implements FilesService {
 
     @Autowired
     private FilesRepository filesRepository;
     @Autowired
-    private MailSender mailSender;
+    private Properties properties;
 
-    private File dir = new File("D:\\ITIS\\trash");
+    private File dir;
     private Long count = 99L;
 
+    @PostConstruct
+    private void setDir(){
+        this.dir = new File(properties.getProperty("storage.path"));
+    }
 
     @Override
-    public void upload(UploadFileDto uploadFileDto, String userEmail) {
+    public Map<String, Object> upload(UploadFileDto uploadFileDto, String userEmail) {
         count = Long.sum(count, 1L);
         try {
             File newFile = File.createTempFile(count.toString(), "." + uploadFileDto.getExtension(), dir);
@@ -43,9 +50,12 @@ public class FilesServiceImpl implements FilesService {
                     .state("READY")
                     .build();
             filesRepository.save(uploadFile);
-            //НАДО ИСПРАВИТЬ ССЫЛКУ
-            mailSender.setTo(userEmail)
-                    .setText("<a href =\"http://localhost:8080/files/1012238545069518409109.pdf\"> Ссылка на скачивание </a>");
+            Map<String, Object> map = new HashMap<>();
+            map.put("uploadFile", uploadFile);
+            map.put("emailTo", userEmail);
+            map.put("templateName", "email_download_link.ftlh");
+            return  map;
+
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
