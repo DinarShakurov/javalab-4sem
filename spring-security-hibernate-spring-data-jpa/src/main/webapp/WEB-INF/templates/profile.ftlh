@@ -7,6 +7,6 @@
     <title>Document</title>
 </head>
 <body>
-Hello, ${username}
+Hello, ${user.name}
 </body>
 </html>
