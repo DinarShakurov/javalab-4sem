@@ -7,6 +7,4 @@ public interface SecurityService {
     String createToken(SignInForm signInForm);
 
     UserDto authorizeByToken(String token);
-
-    boolean isTokenValid(String token);
 }

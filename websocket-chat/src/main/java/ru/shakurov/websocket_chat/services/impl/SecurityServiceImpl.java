@@ -44,19 +44,4 @@ public class SecurityServiceImpl implements SecurityService {
                 .login(claims.get("login", String.class))
                 .build();
     }
-
-    @Override
-    public boolean isTokenValid(String token) {
-        try {
-             Jwts.parser()
-                    .setSigningKey(environment.getRequiredProperty("jwt.secret"))
-                    .parseClaimsJws(token);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-
-    }
-
-
 }
