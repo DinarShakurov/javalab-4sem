@@ -2,6 +2,7 @@ package ru.shakurov.websocket_chat.configurations;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
@@ -9,6 +10,7 @@ import ru.shakurov.websocket_chat.handlers.ChatHandshakeInterceptor;
 import ru.shakurov.websocket_chat.handlers.WebSocketMessagesHandler;
 
 @Configuration
+@EnableWebSocket
 public class WebSocketConfiguration implements WebSocketConfigurer {
     @Autowired
     private WebSocketMessagesHandler handler;
