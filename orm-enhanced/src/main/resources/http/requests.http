@@ -1,0 +1,15 @@
+GET localhost/files/init
+
+###
+
+GET localhost/files/convert
+
+###
+
+GET localhost/users/38/files/png/convert
+
+###
+
+GET localhost/users/38/files/information
+
+###
